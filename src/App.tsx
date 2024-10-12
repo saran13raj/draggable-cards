@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { DocumentsContainer } from './components/DocumentsContainer';
 
 function App() {
