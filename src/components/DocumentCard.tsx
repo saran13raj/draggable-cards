@@ -5,11 +5,10 @@ import { cn } from '../utils/cn';
 import { Spinner } from './Spinner';
 
 export const DocumentCard: React.FC<{
-	index: number;
 	data: DocumentT;
 	isDragging?: boolean;
 	onExpand?: (data: DocumentT) => void;
-}> = ({ index, data, isDragging, onExpand }) => {
+}> = ({ data, isDragging, onExpand }) => {
 	const [loading, setLoading] = React.useState(true);
 	return (
 		<div

@@ -3,11 +3,18 @@ import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautif
 import _ from 'lodash';
 
 import { DocumentCard } from './DocumentCard';
-import { elapsedTime as elapsedTimeUtil, sortDocuments } from '../utils';
+import {
+	elapsedTime as elapsedTimeUtil,
+	moveDocBetweenChunks,
+	sortDocuments,
+	splitArray
+} from '../utils';
 import { fetchDocumentsOrderAPI, updateDocumentsOrderAPI } from '../api/documentsAPI';
 import { DocumentT } from '../utils/types';
 import { Modal } from './Modal';
 import { Spinner } from './Spinner';
+
+const gridCount = 5;
 
 export const DocumentsContainer: React.FC = () => {
 	const [documents, setDocuments] = React.useState<DocumentT[]>([]);
@@ -38,28 +45,23 @@ export const DocumentsContainer: React.FC = () => {
 	}, [documents, lastSavedAt]);
 
 	const handleDragEnd = (result: DropResult) => {
-		console.log('res:::', result);
-		const oldPosition = result.source.index;
-		const newPosition = result?.destination ? result.destination.index : -1;
-		if (
-			newPosition >= 0 &&
-			oldPosition < documents.length &&
-			newPosition >= 0 &&
-			newPosition <= documents.length
-		) {
-			const dataCopy = [...documents];
-			const cardToMove = documents[oldPosition];
-
-			dataCopy.splice(oldPosition, 1); // Remove the card from the old index
-			dataCopy.splice(newPosition, 0, cardToMove); // Insert the card at the new index
-
-			const updatedDocPositions = dataCopy.map((item, index) => ({
-				...item,
-				position: index // Set position based on current index
-			}));
-
-			setDocuments(updatedDocPositions);
+		// check if the destination is valid
+		if (!result.destination) {
+			return; // dropped outside of a droppable area
 		}
+
+		const { source, destination } = result;
+
+		const updatedDocPositions = moveDocBetweenChunks(
+			documents,
+			source.index,
+			destination.index,
+			source.droppableId,
+			destination.droppableId,
+			gridCount
+		);
+
+		setDocuments(updatedDocPositions);
 	};
 
 	const onExpand = (documents: DocumentT) => {
@@ -109,38 +111,42 @@ export const DocumentsContainer: React.FC = () => {
 				)}
 			</div>
 			<DragDropContext onDragEnd={handleDragEnd}>
-				<Droppable droppableId='documents' direction='horizontal'>
-					{(droppableProvided) => (
-						<div
-							ref={droppableProvided.innerRef}
-							{...droppableProvided.droppableProps}
-							className='grid grid-cols-3 gap-10'
-							// className='flex flex-wrap gap-10'
-							//
-						>
-							{documents &&
-								documents.map((d, index) => (
-									<Draggable key={d.type} draggableId={d.type} index={index}>
-										{(draggableProvided, snapShot) => (
-											<div
-												ref={draggableProvided.innerRef}
-												{...draggableProvided.draggableProps}
-												{...draggableProvided.dragHandleProps}
-												className='focus:outline-none w-44'>
-												<DocumentCard
-													data={d}
-													index={index}
-													isDragging={snapShot.isDragging}
-													onExpand={onExpand}
-												/>
-											</div>
-										)}
-									</Draggable>
-								))}
-							{droppableProvided.placeholder}
-						</div>
-					)}
-				</Droppable>
+				{splitArray(documents, gridCount).map((chunk, index) => (
+					<Droppable
+						key={`documents_${index}`}
+						droppableId={`documents_${index}`}
+						direction='horizontal'>
+						{(droppableProvided) => (
+							<div
+								ref={droppableProvided.innerRef}
+								{...droppableProvided.droppableProps}
+								// className='grid grid-cols-3 gap-10'
+								className='flex gap-10 md:gap-20 mb-10'
+								//
+							>
+								{chunk &&
+									chunk.map((d, index) => (
+										<Draggable key={d.type} draggableId={d.type} index={index}>
+											{(draggableProvided, snapShot) => (
+												<div
+													ref={draggableProvided.innerRef}
+													{...draggableProvided.draggableProps}
+													{...draggableProvided.dragHandleProps}
+													className='focus:outline-none w-44'>
+													<DocumentCard
+														data={d}
+														isDragging={snapShot.isDragging}
+														onExpand={onExpand}
+													/>
+												</div>
+											)}
+										</Draggable>
+									))}
+								{droppableProvided.placeholder}
+							</div>
+						)}
+					</Droppable>
+				))}
 			</DragDropContext>
 			{showImage && (
 				<Modal show={showImage} onClose={setShowImage}>
