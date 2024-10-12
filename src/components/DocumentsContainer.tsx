@@ -14,7 +14,7 @@ import { DocumentT } from '../utils/types';
 import { Modal } from './Modal';
 import { Spinner } from './Spinner';
 
-const gridCount = 5;
+const gridCount = 3;
 
 export const DocumentsContainer: React.FC = () => {
 	const [documents, setDocuments] = React.useState<DocumentT[]>([]);
@@ -45,7 +45,6 @@ export const DocumentsContainer: React.FC = () => {
 	}, [documents, lastSavedAt]);
 
 	const handleDragEnd = (result: DropResult) => {
-		// check if the destination is valid
 		if (!result.destination) {
 			return; // dropped outside of a droppable area
 		}

@@ -50,13 +50,19 @@ export const moveDocBetweenChunks = (
 
 	const cardToMove = docsCopy[sourceChunkIndex * chunkSize + sourceIndex]; // calculate global index
 
+	const destinationIndexAdjusted =
+		destinationChunkIndex * chunkSize +
+		destinationIndex -
+		(destinationChunkIndex > sourceChunkIndex ? 1 : 0); // subtract 1 for multi row below
+
 	docsCopy.splice(sourceChunkIndex * chunkSize + sourceIndex, 1); // remove from old index
-	docsCopy.splice(destinationChunkIndex * chunkSize + destinationIndex, 0, cardToMove); // insert at new index
+	docsCopy.splice(destinationIndexAdjusted, 0, cardToMove); // insert at new index
 
 	// update positions based on current state
 	const updatedDocPositions = docsCopy.map((item, index) => ({
 		...item,
 		position: index
 	}));
+
 	return updatedDocPositions;
 };
