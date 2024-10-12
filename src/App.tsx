@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { DraggableContainer } from './components/DraggableContainer';
+import { DocumentsContainer } from './components/DocumentsContainer';
 
 function App() {
 	return (
 		<div className='text-white p-10'>
-			<DraggableContainer />
+			<DocumentsContainer />
 		</div>
 	);
 }

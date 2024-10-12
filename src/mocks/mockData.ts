@@ -1,4 +1,4 @@
-export const apiData = [
+export const documentsMock = [
 	{
 		type: 'bankdraft',
 		title: 'Bank Draft',
