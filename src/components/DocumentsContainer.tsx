@@ -38,6 +38,7 @@ export const DocumentsContainer: React.FC = () => {
 	}, [documents, lastSavedAt]);
 
 	const handleDragEnd = (result: DropResult) => {
+		console.log('res:::', result);
 		const oldPosition = result.source.index;
 		const newPosition = result?.destination ? result.destination.index : -1;
 		if (
@@ -108,13 +109,13 @@ export const DocumentsContainer: React.FC = () => {
 				)}
 			</div>
 			<DragDropContext onDragEnd={handleDragEnd}>
-				<Droppable droppableId='cards' direction='horizontal'>
+				<Droppable droppableId='documents' direction='horizontal'>
 					{(droppableProvided) => (
 						<div
 							ref={droppableProvided.innerRef}
 							{...droppableProvided.droppableProps}
-							// className='grid grid-cols-3 gap-10'
-							className='flex'
+							className='grid grid-cols-3 gap-10'
+							// className='flex flex-wrap gap-10'
 							//
 						>
 							{documents &&
@@ -124,7 +125,8 @@ export const DocumentsContainer: React.FC = () => {
 											<div
 												ref={draggableProvided.innerRef}
 												{...draggableProvided.draggableProps}
-												{...draggableProvided.dragHandleProps}>
+												{...draggableProvided.dragHandleProps}
+												className='focus:outline-none w-44'>
 												<DocumentCard
 													data={d}
 													index={index}

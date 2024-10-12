@@ -15,8 +15,7 @@ export const DocumentCard: React.FC<{
 		<div
 			onClick={() => onExpand && onExpand(data)}
 			className={cn(
-				'h-64 w-44 rounded-xl backdrop-blur-md bg-opacity-40 flex flex-col',
-				// index >= 3 ? 'col-span-1' : 'col-span-1',
+				'h-64 rounded-xl backdrop-blur-md bg-opacity-40 flex flex-col',
 				isDragging ? 'bg-gray-600' : 'bg-gray-800'
 			)}>
 			<p className='px-2 py-3'>{data.title}</p>
