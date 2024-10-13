@@ -16,8 +16,10 @@ export const handlers = [
 		const updatedDocuments = await request.json();
 
 		localStorage.setItem('documents', JSON.stringify(updatedDocuments));
+		const savedAt = new Date();
+		localStorage.setItem('last-saved-at', savedAt.toISOString());
 		return HttpResponse.json(
-			{ message: 'Documents order updated successfully', data: updatedDocuments },
+			{ message: 'Documents order updated successfully', data: savedAt },
 			{ status: 200 }
 		);
 	})

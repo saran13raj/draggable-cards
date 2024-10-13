@@ -1,50 +1,146 @@
-# React + TypeScript + Vite
+# Draggable Document Cards - Grid Layout
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Vite React application featuring drag and drop functionality for document cards in a grid layout. This project uses **React Beautiful DND** for drag and drop, **Tailwind CSS** for styling, and **TypeScript** for type safety.
 
-Currently, two official plugins are available:
+## Clone Repository
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+To get started with this project, follow these steps:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```
+git clone https://github.com/saran13raj/draggable-cards.git
+cd draggable-cards
+pnpm i
+pnpm dev
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Features
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Drag and Drop to Reorder Documents
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+-   Drag and drop cards within a grid layout
+-   Uses react-beautiful-dnd for a well-maintained and tested drag-and-drop solution
+-   Avoids over-engineering by leveraging an established package
+
+### View Document Detail
+
+-   Click on a card to view an expanded view of the content image
+-   Press ESC or click outside the modal to close
+-   Utilizes @headlessui/react modal component
+
+### Auto Save
+
+-   Automatically calls the API with updated document order every 5 seconds
+-   Displays a loader when the API call is pending
+-   Skips API calls if no order change is detected
+-   Uses MSW (Mock Service Worker) to mock API calls to https://saran13raj.com/draggable-cards
+-   Implements axios for making API calls
+
+## API Design
+
+## Document Type Definition
+
+```typescript
+type Document = {
+	id: string;
+	type: string;
+	title: string;
+	position: number;
+	image: string;
+};
 ```
+
+## API Endpoints
+
+### 1. List All Documents
+
+-   **API Name**: Get All Documents
+-   **Endpoint**: `GET /api/documents`
+-   **Description**: Retrieves a list of all documents.
+-   **Request Body**: None
+-   **Response**:
+    ```json
+    {
+      "documents": Document[]
+    }
+    ```
+
+### 2. Update Document Order
+
+-   **API Name**: Update Document Order
+-   **Endpoint**: `PUT /api/documents/order`
+-   **Description**: Updates the order of documents based on drag-and-drop reordering.
+-   **Request Body**:
+    ```json
+    {
+      "documents": Document[]
+    }
+    ```
+-   **Response**:
+    ```json
+    {
+      "success": boolean,
+      "message": string
+    }
+    ```
+
+### 3. Remove Document
+
+-   **API Name**: Remove Document
+-   **Endpoint**: `DELETE /api/documents/{id}`
+-   **Description**: Removes a document from the list by its ID.
+-   **Request Body**: None
+-   **Response**:
+    ```json
+    {
+      "success": boolean,
+      "message": string
+    }
+    ```
+
+### 4. Add Document
+
+-   **API Name**: Add Document
+-   **Endpoint**: `POST /api/documents`
+-   **Description**: Adds a new document to the list.
+-   **Request Body**:
+    ```json
+    {
+      "type": string,
+      "title": string,
+      "image": string
+    }
+    ```
+-   **Response**:
+    ```json
+    {
+      "success": boolean,
+      "message": string,
+      "document": Document
+    }
+    ```
+
+### 5. Update Document
+
+-   **API Name**: Update Document
+-   **Endpoint**: `PUT /api/documents/{id}`
+-   **Description**: Updates a document's values in the list by its ID.
+-   **Request Body**:
+    ```json
+    {
+      "type": string,
+      "title": string,
+      "image": string
+    }
+    ```
+-   **Response**:
+    ```json
+    {
+      "success": boolean,
+      "message": string,
+      "document": Document
+    }
+    ```
+
+**Enhancement Suggestion:** Add `createdAt`, `updatedAt` timestamps to the document to track document changes.
+
+**Note:** All endpoints will return appropriate HTTP status codes (e.g., 200 for success, 404 for not found, 400 for bad request, etc.) along with the responses described above.

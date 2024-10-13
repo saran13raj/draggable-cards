@@ -3,6 +3,7 @@ import React from 'react';
 import { DocumentT } from '../utils/types';
 import { cn } from '../utils/cn';
 import { Spinner } from './Spinner';
+import { docTypeToImageMap } from '../mocks/mockData';
 
 export const DocumentCard: React.FC<{
 	data: DocumentT;
@@ -21,7 +22,7 @@ export const DocumentCard: React.FC<{
 			<div className='flex flex-col justify-center h-full items-center'>
 				{loading && <Spinner />}
 				<img
-					src={data.image}
+					src={docTypeToImageMap[data.type]}
 					alt={data.title}
 					className='max-h-52 w-full rounded-xl'
 					onLoad={() => setLoading(false)}

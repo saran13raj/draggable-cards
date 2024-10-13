@@ -19,8 +19,11 @@ const gridCount = 3;
 export const DocumentsContainer: React.FC = () => {
 	const [documents, setDocuments] = React.useState<DocumentT[]>([]);
 	const [showImage, setShowImage] = React.useState<boolean>(false);
-	const [currentData, setCurrentData] = React.useState<DocumentT | null>(null);
-	const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null);
+	const [currentDoc, setCurrentDoc] = React.useState<DocumentT | null>(null);
+	const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(() => {
+		const savedDate = localStorage.getItem('last-saved-at');
+		return savedDate ? new Date(savedDate) : null;
+	});
 	const [elapsedTime, setElapsedTime] = React.useState<string>('Unknown');
 	const [apiUpdatePending, setAPIUpdatePending] = React.useState<boolean>(false);
 
@@ -36,6 +39,7 @@ export const DocumentsContainer: React.FC = () => {
 		};
 
 		getData();
+		setElapsedTime(elapsedTimeUtil(lastSavedAt));
 	}, []);
 
 	React.useEffect(() => {
@@ -64,14 +68,15 @@ export const DocumentsContainer: React.FC = () => {
 	};
 
 	const onExpand = (documents: DocumentT) => {
-		setCurrentData(documents);
+		setCurrentDoc(documents);
 		setShowImage(true);
 	};
 
-	const updateDocumentsHelper = (documents: DocumentT[], dateTime: Date) => {
+	const updateDocumentsHelper = (documents: DocumentT[]) => {
 		setAPIUpdatePending(true);
 		updateDocumentsOrderAPI(documents)
-			.then(() => {
+			.then((res) => {
+				const dateTime = new Date(res.data);
 				setLastSavedAt(dateTime);
 				setElapsedTime(elapsedTimeUtil(dateTime));
 			})
@@ -80,17 +85,17 @@ export const DocumentsContainer: React.FC = () => {
 
 	const autoSave = async () => {
 		const savedData = localStorage.getItem('documents');
-		const dateTime = new Date();
+
 		if (savedData) {
 			const oldDocumentsOrder = JSON.parse(savedData);
 			const isOrderChanged = !_.isEqual(oldDocumentsOrder, documents);
 			if (isOrderChanged) {
-				updateDocumentsHelper(documents, dateTime);
+				updateDocumentsHelper(documents);
 				return;
 			}
 		} else {
 			// first save
-			updateDocumentsHelper(documents, dateTime);
+			updateDocumentsHelper(documents);
 			return;
 		}
 
@@ -119,13 +124,10 @@ export const DocumentsContainer: React.FC = () => {
 							<div
 								ref={droppableProvided.innerRef}
 								{...droppableProvided.droppableProps}
-								// className='grid grid-cols-3 gap-10'
-								className='flex gap-10 md:gap-20 mb-10'
-								//
-							>
+								className='flex gap-10 md:gap-20 mb-10'>
 								{chunk &&
 									chunk.map((d, index) => (
-										<Draggable key={d.type} draggableId={d.type} index={index}>
+										<Draggable key={d.id} draggableId={d.id} index={index}>
 											{(draggableProvided, snapShot) => (
 												<div
 													ref={draggableProvided.innerRef}
@@ -149,13 +151,13 @@ export const DocumentsContainer: React.FC = () => {
 			</DragDropContext>
 			{showImage && (
 				<Modal show={showImage} onClose={setShowImage}>
-					{currentData && (
+					{currentDoc && (
 						<div className='p-10 text-white'>
-							<p className='py-3'>{currentData.title}</p>
+							<p className='py-3'>{currentDoc.title}</p>
 							<div className='flex flex-col justify-center items-center'>
 								<img
-									src={currentData.image}
-									alt={currentData.title}
+									src={currentDoc.image}
+									alt={currentDoc.title}
 									className='max-h-80 rounded-xl'
 								/>
 							</div>
