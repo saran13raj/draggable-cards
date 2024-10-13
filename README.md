@@ -13,6 +13,8 @@ pnpm i
 pnpm dev
 ```
 
+**Clear local storage if you face any issues with drag and drop.**
+
 ## Features
 
 ### Drag and Drop to Reorder Documents
@@ -60,7 +62,7 @@ type Document = {
 -   **Response**:
     ```json
     {
-      "documents": Document[]
+      "data": Document[]
     }
     ```
 
@@ -115,7 +117,7 @@ type Document = {
     {
       "success": boolean,
       "message": string,
-      "document": Document
+      "data": Document
     }
     ```
 
@@ -137,7 +139,7 @@ type Document = {
     {
       "success": boolean,
       "message": string,
-      "document": Document
+      "data": Document
     }
     ```
 
